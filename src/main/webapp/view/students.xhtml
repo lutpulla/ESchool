@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/menu.xhtml">
+
+    <ui:define name="center-layouts">
+        <p:layoutUnit position="center" header="Пользователи" >
+            #{studentsController.refresh()}
+            <p:fieldset>
+                <h:form id="formBtn" prependId="false">
+                    <h:panelGrid columns="5" cellspacing="5" style="margin-left: -5px;">
+                        <p:commandButton id="btnRefresh" value="Обновить" action="#{studentsController.refresh()}" update=":formObjects" />
+                        <p:commandButton id="btnAdd" value="Добавить" action="#{studentsController.checkAdd()}" update=":formAddDlg" />
+                        <p:commandButton id="btnEdit" value="Редактировать" action="#{studentsController.checkEdit()}" update=":formEditDlg" onclick="sbmt('objTable')" />
+                        <p:commandButton id="btnDelete" value="Удалить" action="#{studentsController.checkDelete()}" update=":formDeleteDlg" onclick="sbmt('objTable')" />
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="formObjects" prependId="false">
+                    <p:dataTable id="objTable" 
+                                 value="#{studentsController.objectList}" 
+                                 var="obj" 
+                                 rowKey="#{obj.id}" 
+                                 selection="#{studentsController.selectedObject}"
+                                 selectionMode="single" 
+                                 sortBy="id"
+                                 emptyMessage="Нет данных">
+                        <p:ajax event="rowDblselect" listener="#{studentsController.checkEdit()}" update=":formEditDlg" />
+                        <p:column headerText="ID" width="30" sortBy="id">
+                            <h:outputText value="#{obj.id}" />
+                        </p:column>
+                        <p:column headerText="Имя" sortBy="firstName">
+                            <h:outputText value="#{obj.firstName}" />
+                        </p:column>
+                        <p:column headerText="Фамилия" sortBy="lastName">
+                            <h:outputText value="#{obj.lastName}" />
+                        </p:column>
+                        <p:column headerText="День рождения" sortBy="birthDay">
+                            <h:outputText value="#{app.simpleDate(obj.birthDay)}" />
+                        </p:column>
+                        <p:column headerText="Пол" sortBy="sex">
+                            <h:outputText value="#{obj.sex == 'GIRL' ? 'Девочка' : 'Мальчик'}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:fieldset>
+        </p:layoutUnit>
+    </ui:define>
+    <ui:define name="main-dialogs">
+        <p:dialog widgetVar="addDlg"
+                  header="Добавление" 
+                  resizable="false" 
+                  modal="true">
+            <h:form id="formAddDlg" prependId="false">
+                <p:panelGrid columns="2" style="width:100%;">
+                    <h:outputText value="Имя *" />
+                    <p:inputText value="#{studentsController.newObject.firstName}" maxlength="50" validator="#{studentsController.isObjectNameValid}" required="true" requiredMessage="#{bundle.RequiredField}: Имя" />
+                    <h:outputText value="Фамилия" />
+                    <p:inputText value="#{studentsController.newObject.lastName}" maxlength="50" validator="#{studentsController.isObjectNameValid}" />
+                    <h:outputText value="День рождения" />
+                    <p:calendar value="#{studentsController.newObject.birthDay}"
+                                pattern="dd.MM.yyyy" 
+                                timeZone="#{app.timeZone}"
+                                navigator="true"
+                                converterMessage="Ошибка ввода даты!"
+                                size="16" />
+                    <h:outputText value="Пол" />
+                    <p:selectOneMenu value="#{studentsController.newObject.sex}" style="width: 160px;">
+                        <f:selectItem itemValue="BOY" itemLabel="Мальчик" />
+                        <f:selectItem itemValue="GIRL" itemLabel="Девочка" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <div class="dlg-btn">
+                    <p:commandButton value="#{bundle.OK}" action="#{studentsController.add()}" update="formAddDlg,:formObjects" ajax="true"/>
+                    <p:button value="#{bundle.Cancel}" onclick="addDlg.hide(); return false;" />
+                </div>
+            </h:form>
+        </p:dialog>
+        <p:dialog widgetVar="editDlg"
+                  header="Редактирование" 
+                  resizable="false" 
+                  modal="true">
+            <h:form id="formEditDlg" prependId="false">
+                <p:panelGrid columns="2" style="width:100%;">
+                    <h:outputText value="Имя *" />
+                    <p:inputText value="#{studentsController.selectedObject.firstName}" maxlength="50" validator="#{studentsController.isObjectNameValid}" required="true" requiredMessage="#{bundle.RequiredField}: Имя" />
+                    <h:outputText value="Фамилия" />
+                    <p:inputText value="#{studentsController.selectedObject.lastName}" maxlength="50" validator="#{studentsController.isObjectNameValid}" />
+                    <h:outputText value="День рождения" />
+                    <p:calendar value="#{studentsController.selectedObject.birthDay}"
+                                pattern="dd.MM.yyyy" 
+                                timeZone="#{app.timeZone}"
+                                navigator="true"
+                                converterMessage="Ошибка ввода даты!"
+                                size="16" />
+                    <h:outputText value="Пол" />
+                    <p:selectOneMenu value="#{studentsController.selectedObject.sex}" style="width: 160px;">
+                        <f:selectItem itemValue="BOY" itemLabel="Мальчик" />
+                        <f:selectItem itemValue="GIRL" itemLabel="Девочка" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <div class="dlg-btn">
+                    <p:commandButton value="#{bundle.OK}" action="#{studentsController.edit()}" update="formEditDlg,:formObjects" ajax="true"/>
+                    <p:button value="#{bundle.Cancel}" onclick="editDlg.hide(); return false;" />
+                </div>
+            </h:form>
+        </p:dialog>
+        <p:dialog widgetVar="delDlg"
+                  header="Удаление" 
+                  resizable="false" 
+                  modal="true">
+            <h:form id="formDeleteDlg" prependId="false">
+                <div class="dlg-inf" >
+                    <h:outputText value="Вы действительно желаете удалить данную запись?" />
+                </div>
+                <div class="dlg-btn">
+                    <p:commandButton value="#{bundle.Yes}" action="#{studentsController.delete()}" oncomplete="delDlg.hide();" update=":formObjects" ajax="true"/>
+                    <p:button value="#{bundle.No}" onclick="delDlg.hide(); return false;" />
+                </div>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

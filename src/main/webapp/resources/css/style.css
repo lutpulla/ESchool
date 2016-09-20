@@ -1,0 +1,55 @@
+
+html, body {
+    padding: 20px;
+    background-color: #eee;
+    font-size: 14px;
+    font-family: Arial;
+    color: #000000;
+    padding-right: 20px !important;
+}
+
+a {
+    color: #8e8e8e;
+}
+
+a:hover, a:active {
+    text-decoration: none;
+    color: #8e8e8e;
+}
+
+a:visited {
+    color: #8e8e8e;
+}
+
+li {
+    list-style-type: none;
+}
+
+#modal-alert {
+    z-index: 2000;
+}
+
+#message-app {
+    top: 20px;
+    right: 20px;
+    width: 500px;
+    position: absolute;
+    z-index: 2001;
+}
+
+#message-app-btn {
+    top: 34px;
+    right: 30px;
+    position: absolute;
+    z-index: 2002;
+}
+
+.dialog-table {
+    border-collapse: inherit;
+    width:100%;
+}
+
+.close {
+    height: 24px;
+    width: 24px;
+}

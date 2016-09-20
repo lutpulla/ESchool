@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="/template/main.xhtml">
+    <ui:define name="main-head">
+        <link type="text/css" rel="stylesheet" href="#{request.contextPath}/resources/css/bootstrap-datepicker3.css" />
+        <script type="text/javascript" src="#{request.contextPath}/resources/js/bootstrap-datepicker.js" />
+        <script type="text/javascript" src="#{request.contextPath}/resources/js/bootstrap-datepicker.ru.min.js" />
+    </ui:define>
+    <ui:define name="main-script">
+        $(function () {
+            $('#birth-day').datepicker({
+                language: "ru",
+                autoclose: true,
+                orientation: "top auto"
+            });
+            if (#{studentsController.newObject.firstName != null}) {
+                $('div#modal-add').modal('show');
+            }
+        });
+    </ui:define>
+    <ui:define name="main-content">
+        <div style="height: 45px;">
+            <h:outputText value="Добро пожаловать, #{sessionController.user.name}!" style="font-weight: bold;"/>
+            <button class="btn btn-danger" onclick="location.href='#{request.contextPath}/exit'" style="float: right;">Выйти</button>
+        </div>
+        <div class="panel panel-primary" >
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Список учеников
+                </h3>
+            </div>
+            <div class="panel-body">
+                <h:form id="form-objects">
+                    <p>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-add">Добавить нового</button>
+                        <h:commandButton class="btn btn-default" value="Удалить выбранных" action="#{studentsController.delete()}" style="margin-left: 10px;"/>
+                    </p>
+                    <p>
+                        #{studentsController.refresh()}
+                        <h:dataTable id="objTable" 
+                                     value="#{studentsController.objectList}" 
+                                     var="obj"
+                                     styleClass="table">
+                            <h:column>
+                                <h:selectBooleanCheckbox value="#{studentsController.checked[obj.id]}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">ID</f:facet>
+                                <h:outputText value="#{obj.id}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Имя</f:facet>
+                                <h:outputText value="#{obj.firstName}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Фамилия</f:facet>
+                                <h:outputText value="#{obj.lastName}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Пол</f:facet>
+                                <h:outputText value="#{obj.sex == 'GIRL' ? 'Девочка' : 'Мальчик'}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">День рождения</f:facet>
+                                <h:outputText value="#{appController.simpleDate(obj.birthDay)}" />
+                            </h:column>
+                        </h:dataTable>
+                    </p>
+                </h:form>
+            </div>
+        </div>
+        <h:form id="form-add" prependId="false">
+            <div class="modal" id="modal-add" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h4 class="modal-title">Добавить ученика</h4>
+                        </div>
+                        <div class="modal-body">
+                            <h:panelGrid class="dialog-table" columns="2" style="border-spacing: 20px;">
+                                <h:outputText value="Имя *" />
+                                <h:inputText class="form-control" size="40" value="#{studentsController.newObject.firstName}" maxlength="50" />
+                                <h:outputText value="Фамилия" />
+                                <h:inputText class="form-control" size="40" value="#{studentsController.newObject.lastName}" maxlength="50" />
+                                <h:outputText value="Пол" />
+                                <h:selectOneMenu class="form-control" value="#{studentsController.newObject.sex}" style="width: 160px;">
+                                    <f:selectItem itemValue="BOY" itemLabel="Мальчик" />
+                                    <f:selectItem itemValue="GIRL" itemLabel="Девочка" />
+                                </h:selectOneMenu>
+                                <h:outputText value="День рождения" />
+                                <h:inputText class="form-control" id="birth-day" size="40" value="#{studentsController.birthDay}" style="width: 160px;" />
+                            </h:panelGrid>
+                        </div>
+                        <div class="modal-footer">
+                            <h:commandButton class="btn btn-default"  value="Добавить" action="#{studentsController.add()}" />
+                            <h:commandButton class="btn btn-default"  value="Отмена" action="#{studentsController.cancelAdd()}" style="margin-left: 10px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
